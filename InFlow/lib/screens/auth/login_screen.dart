@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:inflow/core/app_theme.dart';
 import 'package:inflow/screens/auth/register_screen.dart';
 import 'package:inflow/screens/main_navigation.dart';
+import 'package:inflow/widgets/inflow_logo.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -42,26 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // InFlow Logo (3D/Gradient Style)
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: isDark ? AppColors.surface : Colors.white,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary.withOpacity(0.3),
-                        blurRadius: 30,
-                        offset: const Offset(0, 10),
-                      ),
-                    ],
-                    gradient: LinearGradient(
-                      colors: [AppColors.primary, AppColors.secondary],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                  ),
-                  child: const Icon(Icons.auto_fix_high, size: 50, color: Colors.white),
-                ),
+                const InFlowLogo(size: 130),
                 const SizedBox(height: 24),
                 Text(
                   'InFlow',

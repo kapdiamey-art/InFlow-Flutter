@@ -34,16 +34,23 @@ class _MainNavigationState extends State<MainNavigation> {
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           border: Border(
-            top: BorderSide(color: Colors.white.withOpacity(0.05), width: 1),
+            top: BorderSide(
+              color: Theme.of(context).brightness == Brightness.dark 
+                  ? Colors.white.withOpacity(0.05) 
+                  : Colors.black.withOpacity(0.05), 
+              width: 1,
+            ),
           ),
         ),
         child: BottomNavigationBar(
           currentIndex: _currentIndex,
           onTap: (index) => setState(() => _currentIndex = index),
           type: BottomNavigationBarType.fixed,
-          backgroundColor: AppColors.background,
-          selectedItemColor: AppColors.primary,
-          unselectedItemColor: AppColors.textDim,
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          selectedItemColor: Theme.of(context).colorScheme.primary,
+          unselectedItemColor: Theme.of(context).brightness == Brightness.dark 
+              ? AppColors.textDim 
+              : AppColors.lTextDim,
           showSelectedLabels: true,
           showUnselectedLabels: true,
           selectedLabelStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600),

@@ -10,10 +10,19 @@ class TimeTab extends StatefulWidget {
 }
 
 class _TimeTabState extends State<TimeTab> {
-  bool _isTimerRunning = false;
-  String _selectedProject = 'Design Phase';
-  Duration _duration = const Duration(hours: 2, minutes: 45, seconds: 12);
   Timer? _timer;
+  
+  // App State: Current Active Tracker
+  String _currentProject = 'Freelance Project A';
+  String _currentPhase = 'Design Phase';
+  
+  // Storage for different project/phase durations
+  final Map<String, Duration> _projectDurations = {
+    'Freelance Project A - Design Phase': const Duration(hours: 2, minutes: 45, seconds: 12),
+    'Freelance Project A - Meeting': Duration.zero,
+    'Internal Tool - Bug Fixing': const Duration(hours: 1, minutes: 15),
+    'Agency Work - Sprint Meeting': const Duration(minutes: 45),
+  };
 
   final List<Map<String, String>> _logs = [
     {'title': 'Client Dashboard UI', 'project': 'Freelance Project A', 'time': '3h 30m'},
@@ -21,92 +30,87 @@ class _TimeTabState extends State<TimeTab> {
     {'title': 'Sprint Meeting', 'project': 'Agency Work', 'time': '45m'},
   ];
 
-  void _startTimer() {
-    setState(() => _isTimerRunning = true);
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      setState(() {
-        _duration += const Duration(seconds: 1);
-      });
-    });
+  @override
+  void initState() {
+    super.initState();
+    _startContinuousTimer();
   }
 
-  void _stopTimer() {
-    setState(() => _isTimerRunning = false);
-    _timer?.cancel();
+  void _startContinuousTimer() {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (mounted) {
+        setState(() {
+          final key = '$_currentProject - $_currentPhase';
+          _projectDurations[key] = (_projectDurations[key] ?? Duration.zero) + const Duration(seconds: 1);
+        });
+      }
+    });
   }
 
   String _formatDuration(Duration d) {
     String twoDigits(int n) => n.toString().padLeft(2, "0");
-    String twoDigitMinutes = twoDigits(d.inMinutes.remainder(60));
-    String twoDigitSeconds = twoDigits(d.inSeconds.remainder(60));
-    return "${twoDigits(d.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
+    return "${twoDigits(d.inHours)}:${twoDigits(d.inMinutes.remainder(60))}:${twoDigits(d.inSeconds.remainder(60))}";
   }
 
-  void _showManualEntryForm() {
-    final nameController = TextEditingController();
-    final hoursController = TextEditingController();
-    final notesController = TextEditingController();
+  void _switchTracker(String project, String phase) {
+    setState(() {
+      _currentProject = project;
+      _currentPhase = phase;
+      final key = '$_currentProject - $_currentPhase';
+      if (!_projectDurations.containsKey(key)) {
+        _projectDurations[key] = Duration.zero;
+      }
+    });
+  }
 
+  void _showPhaseOptions(String project) {
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true,
       backgroundColor: Colors.transparent,
+      isScrollControlled: true,
       builder: (context) => Container(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-          top: 24, left: 24, right: 24,
-        ),
+        padding: const EdgeInsets.all(32),
         decoration: BoxDecoration(
           color: Theme.of(context).scaffoldBackgroundColor,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
         ),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Manual Time Entry', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 24),
-              TextFormField(
-                controller: nameController,
-                decoration: const InputDecoration(hintText: 'Project / Task Name'),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: hoursController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(hintText: 'Hours (e.g. 1.5)'),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: notesController,
-                maxLines: 3,
-                decoration: const InputDecoration(hintText: 'Notes (optional)'),
-              ),
-              const SizedBox(height: 32),
-              ElevatedButton(
-                onPressed: () {
-                  if (nameController.text.isNotEmpty && hoursController.text.isNotEmpty) {
-                    setState(() {
-                      _logs.insert(0, {
-                        'title': nameController.text,
-                        'project': 'Manual Entry',
-                        'time': '${hoursController.text}h',
-                      });
-                    });
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Time entry added!')),
-                    );
-                  }
-                },
-                child: const Text('Add Entry'),
-              ),
-              const SizedBox(height: 48),
-            ],
-          ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Project: $project', style: const TextStyle(fontSize: 16, color: AppColors.textDim)),
+            const SizedBox(height: 8),
+            const Text('Select Phase', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 24),
+            _phaseTile(project, 'Meeting'),
+            _phaseTile(project, 'Frontend'),
+            _phaseTile(project, 'Design Phase'),
+            _phaseTile(project, 'Testing'),
+            const Divider(height: 40),
+            ListTile(
+              leading: const Icon(Icons.add_circle_outline, color: AppColors.primary),
+              title: const Text('Add New Phase', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
+              onTap: () {
+                Navigator.pop(context);
+                // Future implementation for adding phase
+              },
+            ),
+            const SizedBox(height: 20),
+          ],
         ),
       ),
+    );
+  }
+
+  Widget _phaseTile(String project, String phase) {
+    final isActive = _currentProject == project && _currentPhase == phase;
+    return ListTile(
+      title: Text(phase, style: TextStyle(fontWeight: isActive ? FontWeight.bold : null, color: isActive ? AppColors.primary : null)),
+      trailing: isActive ? const Icon(Icons.check_circle, color: AppColors.primary) : const Icon(Icons.chevron_right),
+      onTap: () {
+        _switchTracker(project, phase);
+        Navigator.pop(context);
+      },
     );
   }
 
@@ -118,137 +122,156 @@ class _TimeTabState extends State<TimeTab> {
 
   @override
   Widget build(BuildContext context) {
+    final activeKey = '$_currentProject - $_currentPhase';
+    final activeDuration = _projectDurations[activeKey] ?? Duration.zero;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Time Tracker')),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      appBar: AppBar(
+        title: const Text('Time Tracker'), 
+        backgroundColor: Colors.transparent, 
+        elevation: 0,
+        centerTitle: true,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           children: [
             // Timer Card
             Container(
-              padding: const EdgeInsets.all(32),
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 32),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [AppColors.primary, AppColors.secondary],
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF4361EE), Color(0xFF7209B7)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
-                borderRadius: BorderRadius.circular(32),
+                borderRadius: BorderRadius.circular(40),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.primary.withOpacity(0.3),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
+                    color: const Color(0xFF4361EE).withOpacity(0.35),
+                    blurRadius: 30,
+                    offset: const Offset(0, 15),
                   ),
                 ],
               ),
               child: Column(
                 children: [
-                  Text(_formatDuration(_duration), 
-                    style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: 2)),
-                  const SizedBox(height: 8),
-                  DropdownButton<String>(
-                    value: _selectedProject,
-                    dropdownColor: AppColors.surface,
-                    underline: const SizedBox(),
-                    icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white70),
-                    items: ['Design Phase', 'Frontend Dev', 'Meeting'].map((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500)),
-                      );
-                    }).toList(),
-                    onChanged: (val) => setState(() => _selectedProject = val!),
+                  Text(
+                    _currentProject.toUpperCase(),
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.7), 
+                      fontSize: 12, 
+                      fontWeight: FontWeight.bold, 
+                      letterSpacing: 1.5,
+                    ),
                   ),
-                  const SizedBox(height: 32),
-                  InkWell(
-                    onTap: _isTimerRunning ? _stopTimer : _startTimer,
+                  const SizedBox(height: 8),
+                  Text(
+                    _formatDuration(activeDuration),
+                    style: const TextStyle(
+                      fontSize: 64, 
+                      fontWeight: FontWeight.bold, 
+                      color: Colors.white,
+                      fontFamily: 'monospace',
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  GestureDetector(
+                    onTap: () => _showPhaseOptions(_currentProject),
                     child: Container(
-                      padding: const EdgeInsets.all(24),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10),
-                        ],
+                        color: Colors.white.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Icon(
-                        _isTimerRunning ? Icons.stop_rounded : Icons.play_arrow_rounded,
-                        color: AppColors.primary,
-                        size: 40,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            _currentPhase, 
+                            style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
+                          ),
+                          const Icon(Icons.keyboard_arrow_down, color: Colors.white),
+                        ],
                       ),
                     ),
                   ),
+                  const SizedBox(height: 60), // Increased space since button is gone
                 ],
               ),
             ),
-            const SizedBox(height: 48),
+            
+            const SizedBox(height: 40),
             
             // Today's Logs Header
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Today's Logs", style: Theme.of(context).textTheme.titleLarge),
-                ElevatedButton.icon(
-                  onPressed: _showManualEntryForm,
+                const Text("Today's Logs", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                TextButton.icon(
+                  onPressed: () {},
                   icon: const Icon(Icons.add, size: 18),
                   label: const Text('Add Log'),
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(120, 40),
-                    backgroundColor: AppColors.primary.withOpacity(0.1),
-                    foregroundColor: AppColors.primary,
-                    elevation: 0,
-                  ),
+                  style: TextButton.styleFrom(foregroundColor: AppColors.primary),
                 ),
               ],
             ),
-            const SizedBox(height: 24),
+            
+            const SizedBox(height: 16),
             
             // Logs List
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: _logs.length,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 16.0),
-                  child: Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).cardTheme.color,
-                      borderRadius: BorderRadius.circular(24),
-                      boxShadow: Theme.of(context).brightness == Brightness.light 
-                        ? [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10)] : [],
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: AppColors.primary.withOpacity(0.1),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.access_time_filled, color: AppColors.primary, size: 20),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(_logs[index]['title']!, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                              Text(_logs[index]['project']!, style: const TextStyle(color: AppColors.textDim, fontSize: 12)),
-                            ],
-                          ),
-                        ),
-                        Text(_logs[index]['time']!, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppColors.accent)),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 40),
+            ..._logs.map((log) => _buildLogItem(log)).toList(),
+            const SizedBox(height: 32),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLogItem(Map<String, String> log) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: InkWell(
+        onTap: () {
+          setState(() => _currentProject = log['project']!);
+          _showPhaseOptions(log['project']!);
+        },
+        borderRadius: BorderRadius.circular(24),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardTheme.color,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: Colors.white.withOpacity(0.05)),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Icon(Icons.timer, color: AppColors.primary, size: 24),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(log['title']!, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    Text(log['project']!, style: const TextStyle(color: AppColors.textDim, fontSize: 12)),
+                  ],
+                ),
+              ),
+              Text(
+                log['time']!, 
+                style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.accent),
+              ),
+            ],
+          ),
         ),
       ),
     );
