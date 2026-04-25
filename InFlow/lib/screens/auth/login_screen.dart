@@ -58,17 +58,9 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // InFlow Logo (3D/Gradient Style)
-                const InFlowLogo(size: 130),
-                const SizedBox(height: 24),
-                Text(
-                  'InFlow',
-                  style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                    color: isDark ? Colors.white : AppColors.lTextBody,
-                    letterSpacing: -1,
-                    fontSize: 40,
-                  ),
-                ),
+                // InFlow Branding (Icon + Text)
+                const InFlowLogo(size: 60, showText: true, horizontal: true),
+                const SizedBox(height: 12),
                 Text(
                   'Smart assistant for freelancers',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
