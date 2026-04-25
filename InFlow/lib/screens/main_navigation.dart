@@ -46,7 +46,8 @@ class _MainNavigationState extends State<MainNavigation> {
           unselectedItemColor: AppColors.textDim,
           showSelectedLabels: true,
           showUnselectedLabels: true,
-          textStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600),
+          selectedLabelStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600),
+          unselectedLabelStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600),
           items: const [
             BottomNavigationBarItem(
               icon: Icon(Icons.dashboard_outlined),

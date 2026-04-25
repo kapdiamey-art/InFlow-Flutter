@@ -68,11 +68,11 @@ class _InvoicesTabState extends State<InvoicesTab> {
               itemCount: 5,
               itemBuilder: (context, index) {
                 final invoices = [
-                  {'client': 'TechCorp Solutions', 'amount': '$4,500', 'date': '20 May 2026', 'status': 'Pending'},
-                  {'client': 'Design Studio', 'amount': '$1,200', 'date': '15 May 2026', 'status': 'Paid'},
-                  {'client': 'Global Marketing', 'amount': '$3,850', 'date': '10 May 2026', 'status': 'Overdue'},
-                  {'client': 'Local Bakery', 'amount': '$450', 'date': '01 May 2026', 'status': 'Paid'},
-                  {'client': 'Startup X', 'amount': '$2,100', 'date': '25 Apr 2026', 'status': 'Paid'},
+                  {'client': 'TechCorp Solutions', 'amount': '\$4,500', 'date': '20 May 2026', 'status': 'Pending'},
+                  {'client': 'Design Studio', 'amount': '\$1,200', 'date': '15 May 2026', 'status': 'Paid'},
+                  {'client': 'Global Marketing', 'amount': '\$3,850', 'date': '10 May 2026', 'status': 'Overdue'},
+                  {'client': 'Local Bakery', 'amount': '\$450', 'date': '01 May 2026', 'status': 'Paid'},
+                  {'client': 'Startup X', 'amount': '\$2,100', 'date': '25 Apr 2026', 'status': 'Paid'},
                 ];
                 final status = invoices[index]['status']!;
                 Color statusColor = AppColors.success;

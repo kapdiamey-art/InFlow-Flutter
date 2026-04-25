@@ -45,9 +45,9 @@ class HomeTab extends StatelessWidget {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                  MetricCard(title: 'Total Earnings', value: '$12,450', color: AppColors.primary),
-                  MetricCard(title: 'Pending', value: '$3,200', color: AppColors.secondary),
-                  MetricCard(title: 'Overdue', value: '$850', color: AppColors.error),
+                  MetricCard(title: 'Total Earnings', value: '\$12,450', color: AppColors.primary),
+                  MetricCard(title: 'Pending', value: '\$3,200', color: AppColors.secondary),
+                  MetricCard(title: 'Overdue', value: '\$850', color: AppColors.error),
                   MetricCard(title: 'Hours worked', value: '142h', color: AppColors.accent),
                 ],
               ),
@@ -105,7 +105,7 @@ class HomeTab extends StatelessWidget {
                   {'icon': Icons.description, 'title': 'Invoice #204 generated', 'time': '2h ago'},
                   {'icon': Icons.email, 'title': 'Invoice sent to Client X', 'time': '4h ago'},
                   {'icon': Icons.chat, 'title': 'WhatsApp reminder sent', 'time': 'Yesterday'},
-                  {'icon': Icons.payment, 'title': 'Payment received: $2,400', 'time': 'Yesterday'},
+                  {'icon': Icons.payment, 'title': 'Payment received: \$2,400', 'time': 'Yesterday'},
                 ];
                 return ListTile(
                   leading: CircleAvatar(
@@ -158,7 +158,7 @@ class HomeTab extends StatelessWidget {
                             ),
                           ],
                         ),
-                        Text('$1,200', style: Theme.of(context).textTheme.headlineSmall),
+                        Text('\$1,200', style: Theme.of(context).textTheme.headlineSmall),
                         Text('12 May 2026', style: TextStyle(color: AppColors.textDim, fontSize: 12)),
                       ],
                     ),

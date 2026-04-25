@@ -33,7 +33,7 @@ class AppTheme {
         bodyLarge: GoogleFonts.outfit(fontSize: 16),
         bodyMedium: GoogleFonts.outfit(fontSize: 14),
       ),
-      cardTheme: CardTheme(
+      cardTheme: const CardThemeData(
         color: AppColors.surface,
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),

@@ -39,8 +39,8 @@ class ProfileTab extends StatelessWidget {
                   width: 80,
                   child: TextField(
                     textAlign: TextAlign.end,
-                    decoration: InputDecoration(
-                      hintText: '$50',
+                    decoration: const InputDecoration(
+                      hintText: '\$50',
                       fillColor: Colors.transparent,
                       contentPadding: EdgeInsets.zero,
                     ),
