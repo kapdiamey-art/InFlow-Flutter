@@ -15,7 +15,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
 
   void _handleLogin() {
-    // Navigate to Main Navigation (Mock login)
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (context) => const MainNavigation()),
     );
@@ -23,91 +22,121 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Logo/Title
-              Text(
-                'InFlow',
-                style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                  color: AppColors.primary,
-                  letterSpacing: -1,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Your invisible assistant',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textDim,
-                ),
-              ),
-              const SizedBox(height: 48),
-              
-              // Login Card
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: Column(
-                    children: [
-                      Text(
-                        'Welcome Back',
-                        style: Theme.of(context).textTheme.headlineMedium,
-                      ),
-                      const SizedBox(height: 24),
-                      TextFormField(
-                        controller: _emailController,
-                        decoration: const InputDecoration(
-                          hintText: 'Email',
-                          prefixIcon: Icon(Icons.email_outlined, color: AppColors.textDim),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        controller: _passwordController,
-                        obscureText: true,
-                        decoration: const InputDecoration(
-                          hintText: 'Password',
-                          prefixIcon: Icon(Icons.lock_outline, color: AppColors.textDim),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      ElevatedButton(
-                        onPressed: _handleLogin,
-                        child: const Text('Login'),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: isDark 
+              ? [AppColors.background, const Color(0xFF1A1A2E)]
+              : [AppColors.lBackground, Colors.white],
+          ),
+        ),
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(32.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // InFlow Logo (3D/Gradient Style)
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: isDark ? AppColors.surface : Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withOpacity(0.3),
+                        blurRadius: 30,
+                        offset: const Offset(0, 10),
                       ),
                     ],
+                    gradient: LinearGradient(
+                      colors: [AppColors.primary, AppColors.secondary],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                  child: const Icon(Icons.auto_fix_high, size: 50, color: Colors.white),
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  'InFlow',
+                  style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                    color: isDark ? Colors.white : AppColors.lTextBody,
+                    letterSpacing: -1,
+                    fontSize: 40,
                   ),
                 ),
-              ),
-              
-              const SizedBox(height: 24),
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => const RegisterScreen()),
-                  );
-                },
-                child: RichText(
-                  text: TextSpan(
-                    text: "Don't have an account? ",
-                    style: const TextStyle(color: AppColors.textDim),
-                    children: [
-                      TextSpan(
-                        text: "Register",
-                        style: TextStyle(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
+                Text(
+                  'Smart assistant for freelancers',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: isDark ? AppColors.textDim : AppColors.lTextDim,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(height: 60),
+                
+                // Login Form
+                Column(
+                  children: [
+                    TextFormField(
+                      controller: _emailController,
+                      decoration: const InputDecoration(
+                        hintText: 'Email',
+                        prefixIcon: Icon(Icons.email_outlined),
                       ),
-                    ],
+                    ),
+                    const SizedBox(height: 20),
+                    TextFormField(
+                      controller: _passwordController,
+                      obscureText: true,
+                      decoration: const InputDecoration(
+                        hintText: 'Password',
+                        prefixIcon: Icon(Icons.lock_outline),
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    ElevatedButton(
+                      onPressed: _handleLogin,
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 18),
+                        elevation: 8,
+                        shadowColor: AppColors.primary.withOpacity(0.4),
+                      ),
+                      child: const Text('Login'),
+                    ),
+                  ],
+                ),
+                
+                const SizedBox(height: 32),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => const RegisterScreen()),
+                    );
+                  },
+                  child: RichText(
+                    text: TextSpan(
+                      text: "Don't have an account? ",
+                      style: TextStyle(color: isDark ? AppColors.textDim : AppColors.lTextDim),
+                      children: [
+                        const TextSpan(
+                          text: "Register",
+                          style: TextStyle(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

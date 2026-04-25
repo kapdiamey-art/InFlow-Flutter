@@ -6,16 +6,54 @@ void main() {
   runApp(const InFlowApp());
 }
 
-class InFlowApp extends StatelessWidget {
+class InFlowThemeManager extends InheritedWidget {
+  final ThemeMode themeMode;
+  final Function(ThemeMode) onThemeChanged;
+
+  const InFlowThemeManager({
+    super.key,
+    required this.themeMode,
+    required this.onThemeChanged,
+    required super.child,
+  });
+
+  static InFlowThemeManager? of(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<InFlowThemeManager>();
+  }
+
+  @override
+  bool updateShouldNotify(InFlowThemeManager oldWidget) => themeMode != oldWidget.themeMode;
+}
+
+class InFlowApp extends StatefulWidget {
   const InFlowApp({super.key});
 
   @override
+  State<InFlowApp> createState() => _InFlowAppState();
+}
+
+class _InFlowAppState extends State<InFlowApp> {
+  ThemeMode _themeMode = ThemeMode.dark;
+
+  void _toggleTheme(ThemeMode mode) {
+    setState(() {
+      _themeMode = mode;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'InFlow',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.darkTheme,
-      home: const LoginScreen(),
+    return InFlowThemeManager(
+      themeMode: _themeMode,
+      onThemeChanged: _toggleTheme,
+      child: MaterialApp(
+        title: 'InFlow',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+        themeMode: _themeMode,
+        home: const LoginScreen(),
+      ),
     );
   }
 }
