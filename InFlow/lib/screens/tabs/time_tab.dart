@@ -63,7 +63,102 @@ class _TimeTabState extends State<TimeTab> {
     });
   }
 
+  void _showAddLogDialog() {
+    final titleController = TextEditingController();
+    final projectController = TextEditingController();
+    final timeController = TextEditingController();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom, top: 32, left: 24, right: 24),
+        decoration: BoxDecoration(color: Theme.of(context).scaffoldBackgroundColor, borderRadius: const BorderRadius.vertical(top: Radius.circular(32))),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Add New Log', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 24),
+            TextField(controller: titleController, decoration: const InputDecoration(hintText: 'Task Title (e.g. Code Review)')),
+            const SizedBox(height: 16),
+            TextField(controller: projectController, decoration: const InputDecoration(hintText: 'Project Name')),
+            const SizedBox(height: 16),
+            TextField(controller: timeController, decoration: const InputDecoration(hintText: 'Duration (e.g. 2h 30m)')),
+            const SizedBox(height: 32),
+            ElevatedButton(
+              onPressed: () {
+                if (titleController.text.isNotEmpty && projectController.text.isNotEmpty) {
+                  setState(() {
+                    _logs.insert(0, {
+                      'title': titleController.text,
+                      'project': projectController.text,
+                      'time': timeController.text.isEmpty ? '0m' : timeController.text,
+                    });
+                  });
+                  Navigator.pop(context);
+                }
+              },
+              child: const Text('Add Log'),
+            ),
+            const SizedBox(height: 48),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showAddPhaseDialog(String project) {
+    final controller = TextEditingController();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom, top: 32, left: 24, right: 24),
+        decoration: BoxDecoration(color: Theme.of(context).scaffoldBackgroundColor, borderRadius: const BorderRadius.vertical(top: Radius.circular(32))),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Add New Phase', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 24),
+            TextField(controller: controller, decoration: const InputDecoration(hintText: 'Phase Name (e.g. Backend Dev)')),
+            const SizedBox(height: 32),
+            ElevatedButton(
+              onPressed: () {
+                if (controller.text.isNotEmpty) {
+                  setState(() {
+                    final key = '$project - ${controller.text}';
+                    if (!_projectDurations.containsKey(key)) {
+                      _projectDurations[key] = Duration.zero;
+                    }
+                  });
+                  Navigator.pop(context);
+                  _switchTracker(project, controller.text);
+                }
+              },
+              child: const Text('Add Phase'),
+            ),
+            const SizedBox(height: 48),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _showPhaseOptions(String project) {
+    // Get unique phases for this project from our durations map
+    List<String> projectPhases = _projectDurations.keys
+        .where((key) => key.startsWith('$project - '))
+        .map((key) => key.replaceFirst('$project - ', ''))
+        .toList();
+    
+    // Ensure default phases exist if none are found
+    if (projectPhases.isEmpty) {
+      projectPhases = ['Meeting', 'Frontend', 'Design Phase'];
+    }
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -82,17 +177,14 @@ class _TimeTabState extends State<TimeTab> {
             const SizedBox(height: 8),
             const Text('Select Phase', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
             const SizedBox(height: 24),
-            _phaseTile(project, 'Meeting'),
-            _phaseTile(project, 'Frontend'),
-            _phaseTile(project, 'Design Phase'),
-            _phaseTile(project, 'Testing'),
+            ...projectPhases.map((p) => _phaseTile(project, p)).toList(),
             const Divider(height: 40),
             ListTile(
               leading: const Icon(Icons.add_circle_outline, color: AppColors.primary),
               title: const Text('Add New Phase', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
               onTap: () {
                 Navigator.pop(context);
-                // Future implementation for adding phase
+                _showAddPhaseDialog(project);
               },
             ),
             const SizedBox(height: 20),
@@ -140,7 +232,7 @@ class _TimeTabState extends State<TimeTab> {
             // Timer Card
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 32),
+              padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
                   colors: [Color(0xFF4361EE), Color(0xFF7209B7)],
@@ -168,13 +260,19 @@ class _TimeTabState extends State<TimeTab> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    _formatDuration(activeDuration),
-                    style: const TextStyle(
-                      fontSize: 64, 
-                      fontWeight: FontWeight.bold, 
-                      color: Colors.white,
-                      fontFamily: 'monospace',
+                  SizedBox(
+                    width: double.infinity,
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        _formatDuration(activeDuration),
+                        style: const TextStyle(
+                          fontSize: 64, 
+                          fontWeight: FontWeight.bold, 
+                          color: Colors.white,
+                          fontFamily: 'monospace',
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -198,7 +296,7 @@ class _TimeTabState extends State<TimeTab> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 60), // Increased space since button is gone
+                  const SizedBox(height: 40),
                 ],
               ),
             ),
@@ -211,7 +309,7 @@ class _TimeTabState extends State<TimeTab> {
               children: [
                 const Text("Today's Logs", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                 TextButton.icon(
-                  onPressed: () {},
+                  onPressed: _showAddLogDialog,
                   icon: const Icon(Icons.add, size: 18),
                   label: const Text('Add Log'),
                   style: TextButton.styleFrom(foregroundColor: AppColors.primary),
