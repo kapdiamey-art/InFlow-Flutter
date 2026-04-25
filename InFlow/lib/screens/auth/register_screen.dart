@@ -32,7 +32,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             end: Alignment.bottomRight,
             colors: isDark 
               ? [AppColors.background, const Color(0xFF1A1A2E)]
-              : [AppColors.lBackground, Colors.white],
+              : [AppColors.lBackground, const Color(0xFFFFF7ED)],
           ),
         ),
         child: SingleChildScrollView(

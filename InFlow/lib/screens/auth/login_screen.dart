@@ -3,6 +3,7 @@ import 'package:inflow/core/app_theme.dart';
 import 'package:inflow/screens/auth/register_screen.dart';
 import 'package:inflow/screens/main_navigation.dart';
 import 'package:inflow/widgets/inflow_logo.dart';
+import 'package:inflow/main.dart'; // To access ThemeManager
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -26,6 +27,21 @@ class _LoginScreenState extends State<LoginScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        actions: [
+          IconButton(
+            onPressed: () {
+              final newMode = isDark ? ThemeMode.light : ThemeMode.dark;
+              InFlowThemeManager.of(context)?.onThemeChanged(newMode);
+            },
+            icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode, color: isDark ? Colors.white : AppColors.lTextBody),
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -33,7 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
             end: Alignment.bottomRight,
             colors: isDark 
               ? [AppColors.background, const Color(0xFF1A1A2E)]
-              : [AppColors.lBackground, Colors.white],
+              : [AppColors.lBackground, const Color(0xFFFFF7ED)],
           ),
         ),
         child: Center(

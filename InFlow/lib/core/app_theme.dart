@@ -4,20 +4,20 @@ import 'package:google_fonts/google_fonts.dart';
 class AppColors {
   static const Color background = Color(0xFF0F0F12);
   static const Color surface = Color(0xFF1C1C23);
-  static const Color primary = Color(0xFF4361EE); // Blue
-  static const Color secondary = Color(0xFF7209B7); // Purple
-  static const Color accent = Color(0xFF4CC9F0); // Teal
+  static const Color primary = Color(0xFFFF6B00); // Vibrant Orange
+  static const Color secondary = Color(0xFF22C55E); // Success Green
+  static const Color accent = Color(0xFFFACC15); // Sun Yellow
   static const Color textBody = Color(0xFFE0E0E0);
   static const Color textDim = Color(0xFF9E9E9E);
-  static const Color success = Color(0xFF4CAF50);
+  static const Color success = Color(0xFF22C55E);
   static const Color error = Color(0xFFF44336);
   static const Color warning = Color(0xFFFF9800);
 
   // Light colors
-  static const Color lBackground = Color(0xFFF8F9FE);
-  static const Color lSurface = Color(0xFFFFFFFF);
+  static const Color lBackground = Color(0xFFFFFFFF); // Pure White
+  static const Color lSurface = Color(0xFFF9FAFB);
   static const Color lTextBody = Color(0xFF1A1A1C);
-  static const Color lTextDim = Color(0xFF6E7191);
+  static const Color lTextDim = Color(0xFF6B7280);
 }
 
 class AppTheme {

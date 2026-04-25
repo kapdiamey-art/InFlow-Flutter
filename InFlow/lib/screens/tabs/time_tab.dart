@@ -234,15 +234,15 @@ class _TimeTabState extends State<TimeTab> {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF4361EE), Color(0xFF7209B7)],
+                gradient: LinearGradient(
+                  colors: [AppColors.primary, AppColors.primary.withOpacity(0.8)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 borderRadius: BorderRadius.circular(40),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF4361EE).withOpacity(0.35),
+                    color: AppColors.primary.withOpacity(0.35),
                     blurRadius: 30,
                     offset: const Offset(0, 15),
                   ),
